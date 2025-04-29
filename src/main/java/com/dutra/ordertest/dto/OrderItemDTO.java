@@ -1,12 +1,12 @@
 package com.dutra.ordertest.dto;
 
 public class OrderItemDTO {
-    private String productCode;
+    private Integer productCode;
     private int quantity;
     private java.math.BigDecimal price;
 
-    public String getProductCode() { return productCode; }
-    public void setProductCode(String productCode) { this.productCode = productCode; }
+    public Integer getProductCode() { return productCode; }
+    public void setProductCode(Integer productCode) { this.productCode = productCode; }
 
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }

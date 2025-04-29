@@ -3,10 +3,9 @@ package com.dutra.ordertest.controller;
 import com.dutra.ordertest.dto.OrderDTO;
 import com.dutra.ordertest.model.Order;
 import com.dutra.ordertest.service.OrderService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
-@Api(tags = "Order Controller", description = "endpoints for orders")
+@Tag(name = "Order Controller", description = "endpoints for orders")
 public class OrderController {
 
     private final OrderService orderService;
@@ -27,11 +26,14 @@ public class OrderController {
     }
 
     @PostMapping
-    @ApiOperation(value = "create new order")
-    @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "create order with success"),
-            @ApiResponse(code = 400, message = "invalid data")
-    })
+    @Operation(
+            summary = "create new order",
+            description = "create new order",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "create order with success"),
+                    @ApiResponse(responseCode = "400", description = "invalid data")
+            }
+    )
     public ResponseEntity<Order> createOrder(@RequestBody OrderDTO orderDTO) {
         logger.info("Received request to create order: {}", orderDTO);
         Order order = orderService.createOrder(orderDTO);
@@ -39,6 +41,14 @@ public class OrderController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "list all order",
+            description = "return list of order",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "get list orders"),
+                    @ApiResponse(responseCode = "400", description = "invalid data")
+            }
+    )
     public ResponseEntity<List<Order>> getAllProcessedOrders() {
         List<Order> orders = orderService.findAllProcessedOrders();
         return ResponseEntity.ok(orders);
