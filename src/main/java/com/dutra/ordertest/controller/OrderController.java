@@ -7,6 +7,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,7 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
@@ -30,6 +33,7 @@ public class OrderController {
             @ApiResponse(code = 400, message = "invalid data")
     })
     public ResponseEntity<Order> createOrder(@RequestBody OrderDTO orderDTO) {
+        logger.info("Received request to create order: {}", orderDTO);
         Order order = orderService.createOrder(orderDTO);
         return ResponseEntity.ok(order);
     }
