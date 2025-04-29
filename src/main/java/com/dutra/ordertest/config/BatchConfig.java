@@ -79,7 +79,7 @@ public class BatchConfig {
     public ItemWriter<Order> orderWriter() {
         return items -> {
             for (Order order : items) {
-                logger.info("Gravando pedido ID: {}", order.getId());
+                logger.info("recordind order ID: {}", order.getId());
             }
         };
     }
