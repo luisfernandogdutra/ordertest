@@ -44,5 +44,9 @@ public class OrderService {
     public List<Order> findAllProcessedOrders() {
         return orderRepository.findAll();
     }
+
+    public List<Order> findAllByStatusOrders(String status) {
+        return orderRepository.findByStatus(status);
+    }
 }
 

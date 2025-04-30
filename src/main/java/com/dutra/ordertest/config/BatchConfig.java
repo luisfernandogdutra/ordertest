@@ -71,6 +71,7 @@ public class BatchConfig {
     public ItemProcessor<Order, Order> orderProcessor() {
         return order -> {
             logger.info("processing order ID: {}", order.getId());
+            order.setStatus("PROCESSING");
             return order;
         };
     }

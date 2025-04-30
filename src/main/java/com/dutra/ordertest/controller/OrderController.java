@@ -53,4 +53,24 @@ public class OrderController {
         List<Order> orders = orderService.findAllProcessedOrders();
         return ResponseEntity.ok(orders);
     }
+
+    @GetMapping
+    @Operation(
+            summary = "list all order by status",
+            description = "return list of order by status",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "get list orders by status"),
+                    @ApiResponse(responseCode = "400", description = "invalid data")
+            }
+    )
+    public ResponseEntity<List<Order>> getOrdersByStatus(@RequestParam(required = false) String status) {
+        List<Order> orders;
+        if (status != null) {
+            orders = orderService.findAllByStatusOrders(status);
+        } else {
+            orders = orderService.findAllProcessedOrders();
+        }
+        return ResponseEntity.ok(orders);
+    }
+
 }
