@@ -11,10 +11,11 @@ import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class OrderServiceTest {
 
@@ -31,16 +32,64 @@ class OrderServiceTest {
     @Test
     void shouldCreateOrderSuccessfully() {
         OrderDTO orderDTO = new OrderDTO();
-        orderDTO.setExternalOrderId(10L);
+        orderDTO.setExternalOrderId(123L);
+        orderDTO.setItems(List.of(new OrderItemDTO(1, 2,  BigDecimal.valueOf(10))));
 
-        OrderItemDTO orderItemDTO1 = new OrderItemDTO();
-        orderItemDTO1.setProductCode(1);
-        orderItemDTO1.setQuantity(2);
-        orderItemDTO1.setPrice(BigDecimal.TEN);
+        when(orderRepository.findByExternalOrderId(123L)).thenReturn(Optional.empty());
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        orderDTO.setItems(List.of(orderItemDTO1));
-        orderService.createOrder(orderDTO);
+        Order createdOrder = orderService.createOrder(orderDTO);
 
-        verify(orderRepository, times(1)).save(any(Order.class));
+        assertEquals(123L, createdOrder.getExternalOrderId());
+        assertEquals(BigDecimal.valueOf(20), createdOrder.getTotalAmount());
+        assertEquals("CALCULATED", createdOrder.getStatus());
+        assertNotNull(createdOrder.getCreatedAt());
+
+        verify(orderRepository).save(any(Order.class));
     }
+
+    @Test
+    void shouldThrowExceptionWhenDuplicateOrder() {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setExternalOrderId(2L);
+
+        when(orderRepository.findByExternalOrderId(2L))
+                .thenReturn(Optional.of(new Order()));
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(orderDTO)
+        );
+
+        assertEquals("duplicated order: 2", exception.getMessage());
+        verify(orderRepository, never()).save(any(Order.class));
+    }
+
+    @Test
+    void shouldFindAllProcessedOrders() {
+        List<Order> mockOrders = List.of(new Order(), new Order());
+        when(orderRepository.findAll()).thenReturn(mockOrders);
+
+        List<Order> orders = orderService.findAllProcessedOrders();
+        assertEquals(2, orders.size());
+        verify(orderRepository).findAll();
+    }
+
+    @Test
+    void shouldCalculateCorrectTotalWhenCreatingOrder() {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setExternalOrderId(3L);
+        orderDTO.setItems(List.of(
+                new OrderItemDTO(1, 3, BigDecimal.valueOf(12)),
+                new OrderItemDTO(2, 2, BigDecimal.valueOf(7.5))
+        ));
+
+        when(orderRepository.findByExternalOrderId(3L)).thenReturn(Optional.empty());
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Order createdOrder = orderService.createOrder(orderDTO);
+        assertEquals(BigDecimal.valueOf(51.0), createdOrder.getTotalAmount());
+    }
+
+
 }

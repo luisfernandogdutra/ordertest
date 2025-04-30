@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         info = @Info(
                 title = "API orders",
                 version = "1.0",
-                description = "Documentação da API de gerenciamento de pedidos"
+                description = "Order Management API Documentation"
         )
 )
 public class OrdertestApplication {
